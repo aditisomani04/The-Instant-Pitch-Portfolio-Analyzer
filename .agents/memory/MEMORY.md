@@ -1,0 +1,1 @@
+- [GitHub authorization](github-authorization.md) — source-control connections may require authorization through the Git pane rather than generic reconnect cards.
