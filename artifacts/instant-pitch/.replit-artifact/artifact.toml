@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Instant Pitch"
+description = "A practical portfolio analyzer for students and job seekers. Add a resume and public profile links to get three evidence-based technical and soft strengths, a spoken 30-second elevator pitch, and a LinkedIn headline."
+version = "1.0.0"
+id = "artifacts/instant-pitch"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25812
+
+[services.development]
+run = "pnpm --filter @workspace/instant-pitch run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/instant-pitch", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/instant-pitch/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25812"
+BASE_PATH = "/"

@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: pitch
+    description: Portfolio analysis
 paths:
   /healthz:
     get:
@@ -24,6 +26,67 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /pitch/analyze:
+    post:
+      operationId: analyzePitch
+      tags: [pitch]
+      summary: Analyze a resume and public portfolio links
+      description: Extracts public text from supplied portfolio links and creates evidence-based career messaging from the resume and available sources.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PitchAnalysisInput"
+      responses:
+        "200":
+          description: Generated portfolio analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PitchAnalysis"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "502":
+          description: Analysis could not be completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /pitch/speak:
+    post:
+      operationId: speakPitch
+      tags: [pitch]
+      summary: Create spoken audio for an elevator pitch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PitchSpeechInput"
+      responses:
+        "200":
+          description: Spoken pitch audio
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PitchSpeech"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "502":
+          description: Audio generation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +96,104 @@ components:
           type: string
       required:
         - status
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    PitchSpeechInput:
+      type: object
+      properties:
+        text:
+          type: string
+          minLength: 20
+          maxLength: 1200
+      required: [text]
+    PitchSpeech:
+      type: object
+      properties:
+        audioBase64:
+          type: string
+        mimeType:
+          type: string
+      required: [audioBase64, mimeType]
+    PortfolioLink:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum: [github, linkedin, website]
+        url:
+          type: string
+          format: uri
+          maxLength: 2048
+      required: [kind, url]
+    PitchAnalysisInput:
+      type: object
+      properties:
+        resumeText:
+          type: string
+          minLength: 80
+          maxLength: 24000
+        links:
+          type: array
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/PortfolioLink"
+      required: [resumeText]
+    PitchStrength:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+          enum: [technical, soft]
+        summary:
+          type: string
+        evidence:
+          type: string
+      required: [name, category, summary, evidence]
+    PitchSource:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum: [github, linkedin, website]
+        url:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum: [scraped, unavailable, blocked]
+        characters:
+          type: integer
+          minimum: 0
+        note:
+          type: ["string", "null"]
+      required: [kind, url, status, characters, note]
+    PitchAnalysis:
+      type: object
+      properties:
+        brandSummary:
+          type: string
+        strengths:
+          type: array
+          minItems: 6
+          maxItems: 6
+          items:
+            $ref: "#/components/schemas/PitchStrength"
+        elevatorPitch:
+          type: string
+        linkedinHeadline:
+          type: string
+          maxLength: 140
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/PitchSource"
+        resumeCharacters:
+          type: integer
+      required: [brandSummary, strengths, elevatorPitch, linkedinHeadline, sources, resumeCharacters]
 

@@ -1,6 +1,6 @@
-# [Project name]
+# Instant Pitch
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Instant Pitch helps students and job seekers turn a resume and public portfolio links into an evidence-based personal brand summary, strengths, elevator pitch, and LinkedIn headline.
 
 ## Run & Operate
 
@@ -22,23 +22,33 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/instant-pitch/` — React web app and browser-side resume extraction
+- `artifacts/api-server/src/routes/pitch.ts` — AI analysis and spoken pitch endpoints
+- `artifacts/api-server/src/lib/portfolio-sources.ts` — bounded, public-HTTPS text extraction
+- `lib/api-spec/openapi.yaml` — source of truth for API contracts
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The initial product is stateless: no accounts or server-side resume history. Resume files are read in the browser, and extracted text is sent for AI analysis.
+- LinkedIn and other restricted pages may be inaccessible. Never imply these sources were read; continue with the resume and accessible sources and show the limitation.
+- Spoken pitches use AI-generated audio, not browser speech synthesis.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- PDF, DOCX, and TXT resume upload or pasted resume text
+- Public GitHub, LinkedIn, and personal website text extraction
+- Contextual brand summary, three technical strengths, and three soft strengths with supporting evidence
+- An approximately 30-second elevator pitch with on-demand spoken audio
+- A LinkedIn headline limited to 140 characters, plus copy controls
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+Keep the interface simple to use for students and job seekers.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Re-run API codegen after changing the OpenAPI spec.
+- Resume text and generated speech are not persisted server-side.
 
 ## Pointers
 
